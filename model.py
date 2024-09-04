@@ -74,7 +74,7 @@ class AlexNet(nn.Module):
         )
         # classifier is just a name for linear layers
         # Calculate the correct input features for the classifier
-        self.classifier_input_features = self._get_conv_output(IMAGE_DIM)
+        self.classifier_input_features = self._get_conv_output((3, IMAGE_DIM, IMAGE_DIM))
         
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.5, inplace=True),
