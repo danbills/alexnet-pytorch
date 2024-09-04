@@ -11,6 +11,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils import data
 import torchvision.datasets as datasets
+from torchvision.datasets.folder import ImageFolder, IMG_EXTENSIONS
 import torchvision.transforms as transforms
 from tensorboardX import SummaryWriter
 
@@ -23,12 +24,14 @@ BATCH_SIZE = 128
 MOMENTUM = 0.9
 LR_DECAY = 0.0005
 LR_INIT = 0.01
-IMAGE_DIM = 227  # pixels
+IMAGE_DIM = 224  # pixels
 NUM_CLASSES = 1000  # 1000 classes for imagenet 2012 dataset
-DEVICE_IDS = [0, 1, 2, 3]  # GPUs to use
+# DEVICE_IDS = [0, 1, 2, 3]  # GPUs to use
+DEVICE_IDS = [0]  # GPUs to use
 # modify this to point to your data directory
 INPUT_ROOT_DIR = 'alexnet_data_in'
-TRAIN_IMG_DIR = 'alexnet_data_in/imagenet'
+# TRAIN_IMG_DIR = 'alexnet_data_in/imagenet'
+TRAIN_IMG_DIR = "/home/dan/imagenet"
 OUTPUT_DIR = 'alexnet_data_out'
 LOG_DIR = OUTPUT_DIR + '/tblogs'  # tensorboard logs
 CHECKPOINT_DIR = OUTPUT_DIR + '/models'  # model checkpoints
@@ -122,7 +125,11 @@ if __name__ == '__main__':
     print('AlexNet created')
 
     # create dataset and data loader
+    # echo out training folder for debugging purposes
+    print('Training folder: {}'.format(TRAIN_IMG_DIR))
+    
     dataset = datasets.ImageFolder(TRAIN_IMG_DIR, transforms.Compose([
+        # transforms.Resize(256),
         # transforms.RandomResizedCrop(IMAGE_DIM, scale=(0.9, 1.0), ratio=(0.9, 1.1)),
         transforms.CenterCrop(IMAGE_DIM),
         # transforms.RandomHorizontalFlip(),
