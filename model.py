@@ -57,19 +57,19 @@ class AlexNet(nn.Module):
         # the dimensions after first convolution layer do not lead to 55 x 55.
         self.net = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=96, kernel_size=11, stride=4),  # (b x 96 x 55 x 55)
-            nn.ReLU(),
+            nn.ReLU(inplace=False),
             nn.LocalResponseNorm(size=5, alpha=0.0001, beta=0.75, k=2),  # section 3.3
             nn.MaxPool2d(kernel_size=3, stride=2),  # (b x 96 x 27 x 27)
             nn.Conv2d(96, 256, 5, padding=2),  # (b x 256 x 27 x 27)
-            nn.ReLU(),
+            nn.ReLU(inplace=False),
             nn.LocalResponseNorm(size=5, alpha=0.0001, beta=0.75, k=2),
             nn.MaxPool2d(kernel_size=3, stride=2),  # (b x 256 x 13 x 13)
             nn.Conv2d(256, 384, 3, padding=1),  # (b x 384 x 13 x 13)
-            nn.ReLU(),
+            nn.ReLU(inplace=False),
             nn.Conv2d(384, 384, 3, padding=1),  # (b x 384 x 13 x 13)
-            nn.ReLU(),
+            nn.ReLU(inplace=False),
             nn.Conv2d(384, 256, 3, padding=1),  # (b x 256 x 13 x 13)
-            nn.ReLU(),
+            nn.ReLU(inplace=False),
             nn.MaxPool2d(kernel_size=3, stride=2),  # (b x 256 x 6 x 6)
         )
         # classifier is just a name for linear layers
@@ -77,12 +77,12 @@ class AlexNet(nn.Module):
         self.classifier_input_features = self._get_conv_output((3, IMAGE_DIM, IMAGE_DIM))
         
         self.classifier = nn.Sequential(
-            nn.Dropout(p=0.5, inplace=True),
+            nn.Dropout(p=0.5, inplace=False),
             nn.Linear(in_features=self.classifier_input_features, out_features=4096),
-            nn.ReLU(),
-            nn.Dropout(p=0.5, inplace=True),
+            nn.ReLU(inplace=False),
+            nn.Dropout(p=0.5, inplace=False),
             nn.Linear(in_features=4096, out_features=4096),
-            nn.ReLU(),
+            nn.ReLU(inplace=False),
             nn.Linear(in_features=4096, out_features=num_classes),
         )
         self.init_bias()  # initialize bias
