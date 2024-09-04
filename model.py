@@ -73,9 +73,12 @@ class AlexNet(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=2),  # (b x 256 x 6 x 6)
         )
         # classifier is just a name for linear layers
+        # Calculate the correct input features for the classifier
+        self.classifier_input_features = self._get_conv_output(IMAGE_DIM)
+        
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.5, inplace=True),
-            nn.Linear(in_features=(256 * 6 * 6), out_features=4096),
+            nn.Linear(in_features=self.classifier_input_features, out_features=4096),
             nn.ReLU(),
             nn.Dropout(p=0.5, inplace=True),
             nn.Linear(in_features=4096, out_features=4096),
@@ -94,6 +97,13 @@ class AlexNet(nn.Module):
         nn.init.constant_(self.net[10].bias, 1)
         nn.init.constant_(self.net[12].bias, 1)
 
+    def _get_conv_output(self, shape):
+        batch_size = 1
+        input = torch.autograd.Variable(torch.rand(batch_size, *shape))
+        output_feat = self.net(input)
+        n_size = output_feat.data.view(batch_size, -1).size(1)
+        return n_size
+
     def forward(self, x):
         """
         Pass the input through the net.
@@ -105,7 +115,7 @@ class AlexNet(nn.Module):
             output (Tensor): output tensor
         """
         x = self.net(x)
-        x = x.view(-1, 256 * 6 * 6)  # reduce the dimensions for linear layer input
+        x = x.view(x.size(0), -1)  # flatten the output of conv layers
         return self.classifier(x)
 
 
